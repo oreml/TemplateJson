@@ -1,22 +1,42 @@
-// 动态导入 node-fetch
-let fetch;
+const processPostRequest = (event) => {
+    const jsonData = JSON.parse(event.body);
+    const size = event.queryStringParameters.size;
 
-exports.handler = async function(event, context) {
-    if (!fetch) {
-        fetch = (await import('node-fetch')).default;
-    }
+    if (size) {
+        const sizeInt = parseInt(size, 10);
+        if (isNaN(sizeInt)) {
+            return {
+                statusCode: 400,
+                headers: { "Access-Control-Allow-Origin": "*" },
+                body: JSON.stringify({ error: 'Size must be a valid number' })
+            };
+        }
 
-    // 以下是你的函数逻辑
-    try {
-        // 假设你需要处理一些逻辑，这里不进行外部API调用
+        const responseData = Array.from({ length: sizeInt }, (_, index) => {
+            return { ...jsonData, id: index + 1 };
+        });
+
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Function executed successfully" })
+            headers: { "Access-Control-Allow-Origin": "*" },
+            body: JSON.stringify(responseData)
         };
-    } catch (error) {
+    } else {
         return {
-            statusCode: 500,
-            body: JSON.stringify({ error: error.message })
+            statusCode: 200,
+            headers: { "Access-Control-Allow-Origin": "*" },
+            body: JSON.stringify(jsonData)
         };
     }
+};
+
+exports.handler = async (event) => {
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            headers: { "Access-Control-Allow-Origin": "*" },
+            body: 'Method Not Allowed'
+        };
+    }
+    return processPostRequest(event);
 };
