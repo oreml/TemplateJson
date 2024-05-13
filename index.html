@@ -4,15 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Netlify Function Link Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            color: #5a5a5a;
+        }
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        a {
+            color: #06c;
+        }
+    </style>
 </head>
 <body>
     <h1>Netlify Function Link Generator</h1>
     <form id="linkForm">
-        <label for="jsonData">JSON Object:</label>
-        <input type="text" id="jsonData" name="jsonData" placeholder='{"key":"value"}' required>
+        <label for="jsonData">JSON Object (optional):</label>
+        <input type="text" id="jsonData" name="jsonData" placeholder='{"key":"value"}'>
         <br><br>
-        <label for="size">Size:</label>
-        <input type="number" id="size" name="size" required>
+        <label for="size">Size (optional):</label>
+        <input type="number" id="size" name="size">
         <br><br>
         <button type="button" onclick="generateLink()">Generate Link</button>
     </form>
@@ -21,11 +69,19 @@
     <script>
         function generateLink() {
             var jsonData = document.getElementById('jsonData').value;
+            if (jsonData === "") {
+                jsonData = '{"key":"value"}'; // 使用預設 JSON 對象
+            }
             var size = document.getElementById('size').value;
             var baseUrl = 'https://master--tempjsonresponse.netlify.app/.netlify/functions/api-get';
             var encodedJsonData = encodeURIComponent(jsonData);
 
-            var fullUrl = `${baseUrl}?jsonData=${encodedJsonData}&size=${size}`;
+            var fullUrl = `${baseUrl}?jsonData=${encodedJsonData}`;
+
+            if (size) {
+                fullUrl += `&size=${size}`;
+            }
+
             document.getElementById('generatedLink').href = fullUrl;
             document.getElementById('generatedLink').innerHTML = fullUrl;
         }
