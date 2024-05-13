@@ -1,35 +1,22 @@
-// Assuming you are using the 'node-fetch' package in a Netlify Function
-const fetch = require('node-fetch'); // only if you're making outbound HTTP requests
+// 动态导入 node-fetch
+let fetch;
 
 exports.handler = async function(event, context) {
-    const headers = {
-        "Access-Control-Allow-Origin": "*", // This will allow all domains
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
-    };
-
-    if (event.httpMethod === "OPTIONS") {
-        // To enable CORS
-        return {
-            statusCode: 204,
-            headers,
-        };
+    if (!fetch) {
+        fetch = (await import('node-fetch')).default;
     }
 
-    // Your regular POST handler code
+    // 以下是你的函数逻辑
     try {
-        const data = JSON.parse(event.body);
-        // Process the data, call another API, etc.
+        // 假设你需要处理一些逻辑，这里不进行外部API调用
         return {
             statusCode: 200,
-            headers,
-            body: JSON.stringify({ message: "Data received", data }),
+            body: JSON.stringify({ message: "Function executed successfully" })
         };
     } catch (error) {
         return {
             statusCode: 500,
-            headers,
-            body: JSON.stringify({ error: error.message }),
+            body: JSON.stringify({ error: error.message })
         };
     }
 };
